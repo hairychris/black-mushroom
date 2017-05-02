@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Services that relate to a game of cards, reusable for other projects.
+"""Services that relate to a simplified BlackJack game
 
-This module was built to handle a 52 card game of playing cards.
+This module handles playing a simple game of BlackJack following
+the fules as outlined in the BEcodingtask.pdf file.
 
 Example:
     To run the game related services on their own::
@@ -41,7 +42,7 @@ class GameService(BaseService):
 
         player_rpc (RpcProxy(PlayerService)): users / players
         deck_rpc (RpcProxy(DeckService)): deck of cards
-        
+
         player_cards (int): no. of cards for player at start
         dealer_cards (int): no. of visible cards for dealer at start
         dealer_cards_hidden (int): no. hidden cards for dealer at start

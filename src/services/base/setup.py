@@ -4,10 +4,10 @@ if __name__ == "__main__":
         name='black_mushroom.base',
         version='0.0.1',
         url='http://github.com/hairychris/black-mushroom',
-        description='A simple blackjack game built with Nameko microservices framework',
+        description='A simple blackjack game built with Nameko.',
         author='Chris Franklin',
         author_email='chris@piemonster.me',
-        package_dir = {
+        package_dir={
             'black_mushroom.base': 'base',
         },
         packages=[

@@ -1,8 +1,10 @@
 from flask import Flask, request
 from flasgger import Swagger, swag_from
+from flask_restful import Api, Resource
 from nameko.standalone.rpc import ClusterRpcProxy
 
 app = Flask(__name__)
+api = Api(app)
 Swagger(app)
 CONFIG = {'AMQP_URI': "amqp://guest:guest@localhost"}
 
@@ -21,30 +23,30 @@ def player():
         rpc.mail.send.async(email, subject, msg)
         # asynchronously spawning the player task
         result = rpc.player.create.async(operation, value, other, email)
-        return msg, 200
+        return result, 200
 
 
 class Player(Resource):
     def get(self, name):
-       """
-       This examples uses FlaskRESTful Resource
-       It works also with swag_from, schemas and spec_dict
-       ---
-       parameters:
-         - in: path
-           name: username
-           type: string
-           required: true
-       responses:
-         200:
-           description: A single user item
-           schema:
-             id: User
-             properties:
-               name:
-                 type: string
-                 description: The name of the user
-                 default: Chris Franklin
+        """
+        This examples uses FlaskRESTful Resource
+        It works also with swag_from, schemas and spec_dict
+        ---
+        parameters:
+          - in: path
+            name: username
+            type: string
+            required: true
+        responses:
+          200:
+            description: A single user item
+            schema:
+              id: User
+              properties:
+                name:
+                  type: string
+                  description: The name of the user
+                  default: Chris Franklin
         """
         with ClusterRpcProxy(CONFIG) as rpc:
             # asynchronously spawning and email notification

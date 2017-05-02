@@ -141,7 +141,7 @@ py.test black_mushroom/tests.py
 ### With seperate test database
 
 ```
-py.test black_mushroom/tests.py --test-db-url=sqlite:///test_db.sql
+py.test src/black_mushroom/tests.py --test-db-url=sqlite:///test_db.sql
 ```
 
 ## Docker
