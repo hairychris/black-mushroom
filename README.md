@@ -59,7 +59,7 @@ You will need a database driver, the default is psycopg2 but you could use sqlit
 
 ### Install requirements
 
-You can install core requirements and testing requirements by running:
+You can install the wrapper package:
 
 ```
 pip install .
@@ -129,6 +129,12 @@ n.rpc.game.stick(YOUR_GAME_ID_HERE)
 Which should return you a JSON representation of the game state.
 
 ## Testing
+
+You can install the test requirements by running:
+
+```
+pip install -r requirements.txt
+```
 
 When running tests you can pass database test url with ``--test-db-url`` parameter or override ``db_url`` fixture.
 
