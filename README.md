@@ -62,7 +62,16 @@ You will need a database driver, the default is psycopg2 but you could use sqlit
 You can install core requirements and testing requirements by running:
 
 ```
-pip install -r requirements.txt
+pip install .
+```
+
+You must then also install the services
+
+```
+pip install src/services/base
+pip install src/services/decks
+pip install src/services/games
+pip install src/services/players
 ```
 
 ### Database migrations
