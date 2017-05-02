@@ -1,0 +1,153 @@
+version: "3"
+services:
+  proxy:
+    image: traefik
+    # command: --docker --acme=true --acme.domains='bm.piemonster.me' --acme.email='chris@piemonster.me' --acme.entrypoint=https --acme.storage=acme.json --defaultentrypoints=http --defaultentrypoints=https --entryPoints='Name:http Address::80 Redirect.EntryPoint:https' --logLevel=DEBUG --entryPoints='Name:https Address::443 TLS.Certificates:'
+    command: --web --docker --docker.domain=docker.localhost
+    ports:
+      - "80:80"
+      - "443:443"
+      # - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev/null:/traefik.toml
+
+  rabbit:
+    container_name: rabbit
+    image: rabbitmq:3.6-management
+    ports:
+        - "15673:15672" # Exposing RabbitMQ web management on different port for convenience
+    restart: always
+
+  wait_for_rabbit:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - rabbit
+    command: rabbit:15672
+
+  # Service specific stuff starts here.
+
+  postgres_players:
+    container_name: postgres-players
+    image: postgres
+    ports:
+        - "5435:5432" # Exposing Postgres on different port for convenience
+    environment:
+        POSTGRES_DB: "players_db"
+        POSTGRES_PASSWORD: "password"
+        POSTGRES_USER: "postgres"
+    restart: always
+
+  players:
+    container_name: players
+    build:
+        context: .
+        dockerfile: ./Dockerfile
+    depends_on:
+        - wait_for_rabbit
+        - postgres_players
+    labels:
+      - "traefik.backend=players"
+      - "traefik.frontend.rule=Host:players.docker.localhost"
+    ports:
+        - "8001:8000"
+    links:
+        - "rabbit:rabbit"
+        - "postgres_players:postgres"
+    environment:
+        DB_PASSWORD: "password"
+        DB_USER: "postgres"
+        DB_HOST: "postgres"
+        DB_NAME: "players_db"
+        DB_PORT: "5435"
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbit"
+        RABBIT_PORT: "5672"
+        RABBIT_MANAGEMENT_PORT: "15672"
+        SERVICE: "players"
+    restart: always
+
+  postgres_decks:
+    container_name: postgres-decks
+    image: postgres
+    ports:
+        - "5436:5432" # Exposing Postgres on different port for convenience
+    environment:
+        POSTGRES_DB: "decks_db"
+        POSTGRES_PASSWORD: "password"
+        POSTGRES_USER: "postgres"
+    restart: always
+
+  decks:
+    container_name: decks
+    build:
+        context: .
+        dockerfile: ./Dockerfile
+    depends_on:
+        - wait_for_rabbit
+        - postgres_decks
+    labels:
+      - "traefik.backend=decks"
+      - "traefik.frontend.rule=Host:decks.docker.localhost"
+    ports:
+        - "8002:8000"
+    links:
+        - "rabbit:rabbit"
+        - "postgres_decks:postgres"
+    environment:
+        DB_PASSWORD: "password"
+        DB_USER: "postgres"
+        DB_HOST: "postgres"
+        DB_NAME: "decks_db"
+        DB_PORT: "5436"
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbit"
+        RABBIT_PORT: "5672"
+        RABBIT_MANAGEMENT_PORT: "15672"
+        SERVICE: "decks"
+    restart: always
+
+  postgres_games:
+    container_name: postgres-games
+    image: postgres
+    ports:
+        - "5437:5432" # Exposing Postgres on different port for convenience
+    environment:
+        POSTGRES_DB: "games_db"
+        POSTGRES_PASSWORD: "password"
+        POSTGRES_USER: "postgres"
+    restart: always
+
+  games:
+    container_name: games
+    build:
+        context: .
+        dockerfile: ./Dockerfile
+    depends_on:
+        - wait_for_rabbit
+        - postgres_games
+    labels:
+      - "traefik.backend=games"
+      - "traefik.frontend.rule=Host:games.docker.localhost"
+    ports:
+        - "8003:8000"
+    links:
+        - "rabbit:rabbit"
+        - "postgres_games:postgres"
+    environment:
+        DB_PASSWORD: "password"
+        DB_USER: "postgres"
+        DB_HOST: "postgres"
+        DB_NAME: "games_db"
+        DB_PORT: "5437"
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbit"
+        RABBIT_PORT: "5672"
+        RABBIT_MANAGEMENT_PORT: "15672"
+        SERVICE: "games"
+    restart: always
+

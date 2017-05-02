@@ -1,0 +1,5 @@
+# Core requirements
+-e  # Load packages from setup.py install_requires
+
+# Testing requirements (would be a separate file usually so not installed in prod)
+pytest==3.0.7  			  # Testing framework
